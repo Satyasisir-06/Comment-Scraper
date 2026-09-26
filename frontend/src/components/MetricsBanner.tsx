@@ -1,5 +1,4 @@
 import React from 'react';
-import { MessageSquare, HelpCircle, Layers, Lightbulb, PlayCircle } from 'lucide-react';
 import type { AnalysisMetadata } from '../types';
 
 interface MetricsBannerProps {
@@ -13,55 +12,33 @@ export const MetricsBanner: React.FC<MetricsBannerProps> = ({
 }) => {
   return (
     <div className="metrics-section">
-      <div className="source-info-bar glass-panel">
-        <div className="source-title-group">
-          <PlayCircle className="source-icon" size={20} />
-          <div>
-            <span className="source-type-pill">{metadata.source_type.toUpperCase()}</span>
-            <h2 className="source-title">{metadata.source_title}</h2>
-          </div>
+      <div className="source-info-bar clean-panel">
+        <div className="source-meta-tag">
+          <span className="source-type-pill">{metadata.source_type}</span>
+          <span className="source-status-pill">Analyzed</span>
         </div>
+        <h2 className="source-title">{metadata.source_title}</h2>
       </div>
 
-      <div className="metrics-grid">
-        <div className="metric-card glass-panel">
-          <div className="metric-icon-wrap indigo">
-            <MessageSquare size={22} />
-          </div>
-          <div className="metric-data">
-            <span className="metric-number">{metadata.total_comments_scanned}</span>
-            <span className="metric-label">Comments Scanned</span>
-          </div>
+      <div className="metrics-grid clean-panel">
+        <div className="metric-card">
+          <span className="metric-label">Comments Scanned</span>
+          <span className="metric-number">{metadata.total_comments_scanned}</span>
         </div>
 
-        <div className="metric-card glass-panel">
-          <div className="metric-icon-wrap violet">
-            <HelpCircle size={22} />
-          </div>
-          <div className="metric-data">
-            <span className="metric-number">{metadata.questions_found}</span>
-            <span className="metric-label">Questions Detected</span>
-          </div>
+        <div className="metric-card">
+          <span className="metric-label">Questions Found</span>
+          <span className="metric-number">{metadata.questions_found}</span>
         </div>
 
-        <div className="metric-card glass-panel">
-          <div className="metric-icon-wrap cyan">
-            <Layers size={22} />
-          </div>
-          <div className="metric-data">
-            <span className="metric-number">{metadata.themes_count}</span>
-            <span className="metric-label">Thematic Clusters</span>
-          </div>
+        <div className="metric-card">
+          <span className="metric-label">Thematic Clusters</span>
+          <span className="metric-number">{metadata.themes_count}</span>
         </div>
 
-        <div className="metric-card glass-panel">
-          <div className="metric-icon-wrap amber">
-            <Lightbulb size={22} />
-          </div>
-          <div className="metric-data">
-            <span className="metric-number">{ideasCount}</span>
-            <span className="metric-label">Actionable Ideas</span>
-          </div>
+        <div className="metric-card">
+          <span className="metric-label">Actionable Ideas</span>
+          <span className="metric-number">{ideasCount}</span>
         </div>
       </div>
     </div>

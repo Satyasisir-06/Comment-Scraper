@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, FileJson, FileText } from 'lucide-react';
+import { Copy, Check, Download } from 'lucide-react';
 import type { AnalyzeResponse } from '../types';
 
 interface ExportBarProps {
@@ -10,27 +10,27 @@ export const ExportBar: React.FC<ExportBarProps> = ({ data }) => {
   const [copied, setCopied] = useState(false);
 
   const generateMarkdownReport = (): string => {
-    let md = `# Comment Scraper Intelligence Report\n\n`;
-    md += `**Source Title:** ${data.metadata.source_title}\n`;
-    md += `**Platform:** ${data.metadata.source_type.toUpperCase()}\n`;
-    md += `**Date:** ${new Date(data.timestamp).toLocaleString()}\n`;
-    md += `**Total Comments Scanned:** ${data.metadata.total_comments_scanned}\n`;
-    md += `**Questions Extracted:** ${data.metadata.questions_found}\n`;
-    md += `**Themes Discovered:** ${data.metadata.themes_count}\n\n`;
+    let md = `# Comment Intelligence Report\n\n`;
+    md += `- **Source:** ${data.metadata.source_title}\n`;
+    md += `- **Platform:** ${data.metadata.source_type.toUpperCase()}\n`;
+    md += `- **Generated:** ${new Date(data.timestamp).toISOString()}\n`;
+    md += `- **Comments Scanned:** ${data.metadata.total_comments_scanned}\n`;
+    md += `- **Questions Extracted:** ${data.metadata.questions_found}\n`;
+    md += `- **Themes Discovered:** ${data.metadata.themes_count}\n\n`;
     md += `---\n\n`;
 
     data.themes.forEach((theme, idx) => {
-      md += `## Theme ${idx + 1}: ${theme.name}\n`;
+      md += `## ${idx + 1}. ${theme.name}\n`;
       md += `*Sentiment: ${theme.sentiment}*\n\n`;
-      md += `> ${theme.summary}\n\n`;
+      md += `${theme.summary}\n\n`;
 
-      md += `### ❓ Audience Questions (${theme.questions.length})\n`;
+      md += `### Audience Inquiries (${theme.questions.length})\n`;
       theme.questions.forEach((q) => {
-        md += `- **${q.author}** (${q.likes} likes): "${q.text}"\n`;
+        md += `- **@${q.author}** (${q.likes} likes): "${q.text}"\n`;
       });
       md += `\n`;
 
-      md += `### 💡 Generated Ideas (${theme.generated_ideas.length})\n`;
+      md += `### Recommended Concepts (${theme.generated_ideas.length})\n`;
       theme.generated_ideas.forEach((idea) => {
         md += `#### ${idea.title}\n`;
         md += `- **Format:** ${idea.format}\n`;
@@ -73,11 +73,11 @@ export const ExportBar: React.FC<ExportBarProps> = ({ data }) => {
   };
 
   return (
-    <div className="export-bar-container glass-panel">
+    <div className="export-bar-container clean-panel">
       <div className="export-text-group">
-        <h3 className="export-heading">Export Audience Insights</h3>
+        <h3 className="export-heading">Export Structured Insights</h3>
         <p className="export-subtext">
-          Download clean Markdown documentation or JSON payloads for your content workflow.
+          Export full analysis as documentation or structured JSON for your editorial pipeline.
         </p>
       </div>
 
@@ -89,12 +89,12 @@ export const ExportBar: React.FC<ExportBarProps> = ({ data }) => {
         >
           {copied ? (
             <>
-              <Check size={16} className="text-success" />
-              <span>Copied Report!</span>
+              <Check size={14} className="text-success" />
+              <span>Copied Markdown</span>
             </>
           ) : (
             <>
-              <Copy size={16} />
+              <Copy size={14} />
               <span>Copy Markdown</span>
             </>
           )}
@@ -105,8 +105,8 @@ export const ExportBar: React.FC<ExportBarProps> = ({ data }) => {
           onClick={handleDownloadMarkdown}
           id="download-md-btn"
         >
-          <FileText size={16} />
-          <span>Download .MD</span>
+          <Download size={14} />
+          <span>Download .md</span>
         </button>
 
         <button
@@ -114,8 +114,8 @@ export const ExportBar: React.FC<ExportBarProps> = ({ data }) => {
           onClick={handleDownloadJson}
           id="download-json-btn"
         >
-          <FileJson size={16} />
-          <span>Download JSON</span>
+          <Download size={14} />
+          <span>JSON</span>
         </button>
       </div>
     </div>

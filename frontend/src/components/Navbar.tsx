@@ -1,45 +1,43 @@
 import React from 'react';
-import { Sparkles, Activity } from 'lucide-react';
+import { MessageSquareQuote } from 'lucide-react';
 
 interface NavbarProps {
   isBackendHealthy: boolean | null;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  isBackendHealthy,
-}) => {
+export const Navbar: React.FC<NavbarProps> = ({ isBackendHealthy }) => {
   return (
     <header className="navbar-container">
       <div className="container navbar-inner">
         <div className="brand-group">
           <div className="brand-logo">
-            <Sparkles className="brand-icon" size={22} />
+            <MessageSquareQuote size={18} strokeWidth={2.2} />
           </div>
           <div className="brand-text">
             <span className="brand-title">InsightEcho</span>
-            <span className="brand-badge">Comment Intelligence</span>
+            <span className="brand-badge">Audience Intelligence</span>
           </div>
         </div>
 
         <div className="nav-controls">
           {/* Backend Status indicator */}
-          <div className="status-indicator">
-            <Activity
-              size={15}
-              className={`status-dot ${
-                isBackendHealthy === null
-                  ? 'checking'
-                  : isBackendHealthy
-                  ? 'online'
-                  : 'offline'
-              }`}
-            />
+          <div
+            className={`status-indicator ${
+              isBackendHealthy === null
+                ? 'checking'
+                : isBackendHealthy
+                ? 'online'
+                : 'offline'
+            }`}
+            title="FastAPI Backend Health Status"
+          >
+            <span className="status-dot-circle" />
             <span className="status-text">
               {isBackendHealthy === null
-                ? 'Connecting...'
+                ? 'Connecting'
                 : isBackendHealthy
-                ? 'API Online'
-                : 'API Offline'}
+                ? 'Backend Ready'
+                : 'Backend Offline'}
             </span>
           </div>
 
@@ -48,12 +46,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             href="https://github.com/Satyasisir-06/Comment-Scraper"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-secondary nav-gh-btn"
+            className="btn btn-outline nav-gh-btn"
             id="nav-github-link"
+            aria-label="GitHub Repository"
           >
             <svg
-              width="17"
-              height="17"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"

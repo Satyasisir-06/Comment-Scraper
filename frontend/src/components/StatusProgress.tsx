@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { MessageSquareText, HelpCircle, Layers, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface StatusProgressProps {
   isLoading: boolean;
 }
 
 const STEPS = [
-  { label: 'Scraping comments from source', icon: MessageSquareText },
-  { label: 'Detecting genuine questions', icon: HelpCircle },
-  { label: 'Clustering into thematic intents', icon: Layers },
-  { label: 'Synthesizing actionable ideas', icon: Lightbulb },
+  'Scraping comment payload',
+  'Isolating direct questions',
+  'Clustering thematic intents',
+  'Synthesizing editorial concepts',
 ];
 
 export const StatusProgress: React.FC<StatusProgressProps> = ({ isLoading }) => {
@@ -23,7 +23,7 @@ export const StatusProgress: React.FC<StatusProgressProps> = ({ isLoading }) => 
 
     const interval = setInterval(() => {
       setCurrentStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
-    }, 600);
+    }, 700);
 
     return () => clearInterval(interval);
   }, [isLoading]);
@@ -31,11 +31,14 @@ export const StatusProgress: React.FC<StatusProgressProps> = ({ isLoading }) => 
   if (!isLoading) return null;
 
   return (
-    <div className="status-progress-card glass-panel">
+    <div className="status-progress-card clean-panel">
       <div className="progress-header">
-        <h3 className="progress-title">Processing Comment Stream...</h3>
-        <span className="badge badge-curious animate-pulse-glow">
-          Step {currentStep + 1} of {STEPS.length}
+        <div className="progress-status-left">
+          <div className="spinner-sm animate-spin" />
+          <span className="progress-title">{STEPS[currentStep]}...</span>
+        </div>
+        <span className="step-counter">
+          {currentStep + 1} / {STEPS.length}
         </span>
       </div>
 
@@ -46,25 +49,24 @@ export const StatusProgress: React.FC<StatusProgressProps> = ({ isLoading }) => 
         />
       </div>
 
-      <div className="steps-grid">
+      <div className="steps-row">
         {STEPS.map((step, idx) => {
-          const Icon = step.icon;
           const isDone = idx < currentStep;
           const isCurrent = idx === currentStep;
 
           return (
             <div
-              key={step.label}
+              key={step}
               className={`step-item ${isDone ? 'done' : ''} ${isCurrent ? 'current' : ''}`}
             >
-              <div className="step-icon-wrap">
+              <div className="step-bullet">
                 {isDone ? (
-                  <CheckCircle2 size={18} className="step-icon done-icon" />
+                  <Check size={11} strokeWidth={3} />
                 ) : (
-                  <Icon size={18} className={`step-icon ${isCurrent ? 'animate-spin' : ''}`} />
+                  <span className="step-num">{idx + 1}</span>
                 )}
               </div>
-              <span className="step-label">{step.label}</span>
+              <span className="step-label">{step}</span>
             </div>
           );
         })}

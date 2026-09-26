@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sliders, Wand2, X, AlertCircle } from 'lucide-react';
+import { ArrowRight, X, AlertCircle, MessageCircle, FileText } from 'lucide-react';
 import type { SourceType } from '../types';
 
 interface HeroInputProps {
@@ -62,47 +62,75 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
 
   return (
     <section className="hero-section">
-      <div className="hero-badge-wrap">
-        <span className="badge badge-curious animate-pulse-glow">
-          <Wand2 size={13} />
-          AI Audience Insight Engine
-        </span>
+      <div className="hero-header">
+        <div className="hero-badge-pill">
+          <span className="hero-badge-dot" />
+          <span>Audience Intelligence Engine</span>
+        </div>
+        <h1 className="hero-title">
+          Turn comment threads into actionable content blueprints
+        </h1>
+        <p className="hero-subtitle">
+          Isolate recurring user questions, group thematic demand, and synthesize high-yield ideas with algorithmic precision.
+        </p>
       </div>
 
-      <h1 className="hero-title">
-        Turn Audience Comments Into <br />
-        <span className="text-gradient">High-Yield Content & Product Ideas</span>
-      </h1>
-      <p className="hero-subtitle">
-        Automatically scan comment threads, extract genuine questions, cluster them by
-        thematic demand, and synthesize actionable content blueprints in seconds.
-      </p>
-
-      <form className="search-box glass-panel" onSubmit={handleSubmit} id="analyze-form">
-        <div className="input-row">
-          <div className="input-icon-wrap" title="YouTube Video Source">
-            <svg
-              className="platform-icon"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
+      <form className="search-box clean-panel" onSubmit={handleSubmit} id="analyze-form">
+        {/* Platform Segmented Switch Hallmark */}
+        <div className="platform-segmented-bar">
+          <button
+            type="button"
+            className={`platform-pill ${sourceType === 'youtube' ? 'active' : ''}`}
+            onClick={() => setSourceType('youtube')}
+            disabled={isLoading}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
-          </div>
+            <span>YouTube</span>
+          </button>
+          <button
+            type="button"
+            className={`platform-pill ${sourceType === 'reddit' ? 'active' : ''}`}
+            onClick={() => setSourceType('reddit')}
+            disabled={isLoading}
+          >
+            <MessageCircle size={14} />
+            <span>Reddit</span>
+            <span className="platform-beta-tag">BETA</span>
+          </button>
+          <button
+            type="button"
+            className={`platform-pill ${sourceType === 'raw_text' ? 'active' : ''}`}
+            onClick={() => setSourceType('raw_text')}
+            disabled={isLoading}
+          >
+            <FileText size={14} />
+            <span>Direct Text</span>
+          </button>
+        </div>
 
+        {/* Search Input Row with Keyboard Hallmark */}
+        <div className="input-row">
           <input
             id="url-input-field"
             type="text"
             className="main-url-input"
-            placeholder="Paste YouTube Video URL (e.g. https://www.youtube.com/watch?v=...)"
+            placeholder={
+              sourceType === 'youtube'
+                ? 'Paste YouTube video URL (e.g. https://www.youtube.com/watch?v=...)'
+                : sourceType === 'reddit'
+                ? 'Paste Reddit discussion thread URL...'
+                : 'Paste text or comment block...'
+            }
             value={url}
             onChange={(e) => {
               setUrl(e.target.value);
               if (error) setError(null);
             }}
             disabled={isLoading}
+            autoComplete="off"
+            spellCheck="false"
           />
 
           {url && (
@@ -111,10 +139,15 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
               className="clear-input-btn"
               onClick={() => setUrl('')}
               title="Clear input"
+              aria-label="Clear input"
             >
-              <X size={16} />
+              <X size={14} />
             </button>
           )}
+
+          <div className="input-shortcut-hint">
+            <kbd className="kbd-shortcut">↵ Enter</kbd>
+          </div>
 
           <button
             type="submit"
@@ -125,12 +158,12 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
             {isLoading ? (
               <>
                 <div className="spinner-sm animate-spin" />
-                <span>Analyzing...</span>
+                <span>Scanning</span>
               </>
             ) : (
               <>
-                <Search size={18} />
-                <span>Extract Ideas</span>
+                <span>Extract Insights</span>
+                <ArrowRight size={14} />
               </>
             )}
           </button>
@@ -138,43 +171,17 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
 
         {error && (
           <div className="error-message">
-            <AlertCircle size={15} />
+            <AlertCircle size={13} />
             <span>{error}</span>
           </div>
         )}
 
+        {/* Precision Fine-Tuning Controls */}
         <div className="options-row">
-          <div className="demo-chip-group">
-            <span className="options-label">Platform:</span>
-            <select
-              value={sourceType}
-              onChange={(e) => setSourceType(e.target.value as SourceType)}
-              className="source-select-dropdown"
-              disabled={isLoading}
-            >
-              <option value="youtube">YouTube</option>
-              <option value="reddit">Reddit (Beta)</option>
-              <option value="raw_text">Direct Text</option>
-            </select>
-          </div>
-
-          <div className="demo-chip-group">
-            <span className="options-label">Quick Test:</span>
-            <button
-              type="button"
-              id="try-demo-btn"
-              className="demo-chip-btn"
-              onClick={handleUseDemo}
-              disabled={isLoading}
-            >
-              Try Sample Video
-            </button>
-          </div>
-
-          <div className="slider-group">
-            <Sliders size={14} className="slider-icon" />
-            <span className="options-label">Max Comments:</span>
+          <div className="option-item slider-item">
+            <span className="options-label">Sample Volume:</span>
             <input
+              id="max-comments-slider"
               type="range"
               min="50"
               max="500"
@@ -184,7 +191,7 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
               disabled={isLoading}
               className="range-slider"
             />
-            <span className="slider-value">{maxComments}</span>
+            <span className="mono-val">{maxComments} comments</span>
           </div>
 
           <label className="checkbox-label">
@@ -194,8 +201,20 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
               onChange={(e) => setGenerateIdeas(e.target.checked)}
               disabled={isLoading}
             />
-            <span>Generate Content Ideas</span>
+            <span>Synthesize Content Concepts</span>
           </label>
+
+          <div className="demo-link-wrap">
+            <button
+              type="button"
+              id="try-demo-btn"
+              className="demo-link-btn"
+              onClick={handleUseDemo}
+              disabled={isLoading}
+            >
+              Load Example URL
+            </button>
+          </div>
         </div>
       </form>
     </section>

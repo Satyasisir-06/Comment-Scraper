@@ -6,6 +6,8 @@ import { StatusProgress } from './components/StatusProgress';
 import { MetricsBanner } from './components/MetricsBanner';
 import { ThematicExplorer } from './components/ThematicExplorer';
 import { ExportBar } from './components/ExportBar';
+import { FeatureShowcase } from './components/FeatureShowcase';
+import { mockAnalysisResult } from './mocks/mockAnalysisData';
 import { analyzeComments, checkBackendHealth } from './services/api';
 import type { AnalyzeResponse, SourceType } from './types';
 import { AlertCircle } from 'lucide-react';
@@ -71,22 +73,36 @@ export function App() {
           <StatusProgress isLoading={isLoading} />
 
           {errorMessage && (
-            <div className="glass-panel error-banner">
-              <AlertCircle size={20} className="text-rose" />
+            <div className="clean-panel error-banner">
+              <AlertCircle size={18} className="text-error" />
               <div>
-                <strong>Analysis Failed:</strong> {errorMessage}
+                <strong className="error-title">Analysis failed:</strong> {errorMessage}
                 {!isBackendHealthy && (
                   <p className="error-hint">
-                    Hint: Ensure your backend is running on{' '}
-                    <code>{import.meta.env.VITE_API_URL || 'http://localhost:8000'}</code>.
+                    Backend is unreachable at{' '}
+                    <code>{import.meta.env.VITE_API_URL || 'http://localhost:8000'}</code>. Ensure the server is running.
                   </p>
                 )}
               </div>
             </div>
           )}
 
+          {!analysisData && !isLoading && (
+            <FeatureShowcase onLoadSample={() => setAnalysisData(mockAnalysisResult)} />
+          )}
+
           {analysisData && !isLoading && (
             <>
+              <div className="results-top-nav">
+                <button
+                  type="button"
+                  className="btn btn-outline btn-sm"
+                  onClick={() => setAnalysisData(null)}
+                >
+                  ← New Analysis
+                </button>
+              </div>
+
               <MetricsBanner
                 metadata={analysisData.metadata}
                 ideasCount={totalIdeasCount}
@@ -101,11 +117,9 @@ export function App() {
       </main>
 
       <footer className="footer">
-        <div className="container">
-          <p>
-            InsightEcho — Developed with pair-programming collaboration. Satyasisir (Frontend)
-            &amp; Collaborator (Backend).
-          </p>
+        <div className="container footer-inner">
+          <p>InsightEcho · Minimalist Audience Intelligence</p>
+          <span className="footer-meta">API v1.0.0</span>
         </div>
       </footer>
     </div>
