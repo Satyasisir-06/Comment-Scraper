@@ -1,12 +1,12 @@
 # ⚙️ Backend Service (FastAPI)
 
-FastAPI service for comment scraping, question extraction, and thematic idea generation.
+FastAPI service for comment scraping, question extraction, thematic clustering, and AI idea generation.
 
 ---
 
-## 📖 Backend Roadmap
-Full roadmap and implementation guide:  
-👉 **[Read docs/BACKEND_PLAN.md](../docs/BACKEND_PLAN.md)**
+## 📖 Backend Roadmap & API Contract
+- Full roadmap & implementation guide: 👉 **[`docs/BACKEND_PLAN.md`](../docs/BACKEND_PLAN.md)**
+- API contract specification: 👉 **[`docs/API_CONTRACT.md`](../docs/API_CONTRACT.md)**
 
 ---
 
@@ -30,7 +30,7 @@ Full roadmap and implementation guide:
 3. **Configure environment:**
    ```bash
    cp .env.example .env
-   # Add your GEMINI_API_KEY or YOUTUBE_API_KEY in .env
+   # Set your GEMINI_API_KEY (Google AI Studio) or YOUTUBE_API_KEY in .env
    ```
 
 4. **Run development server:**
@@ -38,6 +38,12 @@ Full roadmap and implementation guide:
    uvicorn app.main:app --reload --port 8000
    ```
 
-5. **Test endpoints:**
+5. **Run tests:**
+   ```bash
+   pytest
+   ```
+
+6. **Endpoints & Interactive OpenAPI Docs:**
    - Health check: `http://localhost:8000/api/health`
-   - Interactive docs: `http://localhost:8000/docs`
+   - Analyze comments: `POST http://localhost:8000/api/analyze`
+   - Interactive Swagger docs: `http://localhost:8000/docs`
