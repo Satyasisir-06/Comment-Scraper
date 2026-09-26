@@ -119,6 +119,23 @@ def fetch_youtube_comments_via_api(
         raise e
 
 
+def fetch_youtube_video_title(video_id: str) -> str:
+    """
+    Fetches the actual video title using YouTube's public oEmbed endpoint.
+    Does not require a YouTube API key.
+    """
+    try:
+        oembed_url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
+        res = requests.get(oembed_url, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            if "title" in data and data["title"]:
+                return data["title"]
+    except Exception:
+        pass
+    return f"YouTube Video ({video_id})"
+
+
 def fetch_youtube_comments_via_downloader(
     video_id: str,
     max_comments: int = 100,
@@ -176,8 +193,9 @@ def fetch_youtube_comments_via_downloader(
             },
         )
 
-    title = f"YouTube Video ({video_id})"
+    title = fetch_youtube_video_title(video_id)
     return title, comments
+
 
 
 def fetch_comments(

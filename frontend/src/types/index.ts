@@ -21,6 +21,8 @@ export interface QuestionItem {
   published_at: string;
 }
 
+export type CommentItem = QuestionItem;
+
 export interface GeneratedIdea {
   id: string;
   title: string;
@@ -53,7 +55,9 @@ export interface AnalyzeResponse {
   timestamp: string;
   metadata: AnalysisMetadata;
   themes: ThemeCluster[];
+  raw_comments?: CommentItem[];
 }
+
 
 export interface ApiError {
   error: string;
