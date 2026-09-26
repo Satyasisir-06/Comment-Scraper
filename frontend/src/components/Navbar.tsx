@@ -1,15 +1,11 @@
 import React from 'react';
-import { Sparkles, Activity, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Sparkles, Activity } from 'lucide-react';
 
 interface NavbarProps {
-  useMock: boolean;
-  onToggleMock: () => void;
   isBackendHealthy: boolean | null;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  useMock,
-  onToggleMock,
   isBackendHealthy,
 }) => {
   return (
@@ -26,34 +22,21 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         <div className="nav-controls">
-          {/* Mock mode toggle */}
-          <button
-            id="toggle-mock-mode-btn"
-            className={`mock-toggle-btn ${useMock ? 'active' : ''}`}
-            onClick={onToggleMock}
-            title={useMock ? 'Using sample mock data' : 'Calling live FastAPI backend'}
-          >
-            {useMock ? (
-              <ToggleRight className="toggle-icon on" size={20} />
-            ) : (
-              <ToggleLeft className="toggle-icon off" size={20} />
-            )}
-            <span className="toggle-label">
-              {useMock ? 'Mock Mode (Instant Demo)' : 'Live Backend'}
-            </span>
-          </button>
-
           {/* Backend Status indicator */}
           <div className="status-indicator">
             <Activity
               size={15}
               className={`status-dot ${
-                useMock ? 'mock' : isBackendHealthy ? 'online' : 'offline'
+                isBackendHealthy === null
+                  ? 'checking'
+                  : isBackendHealthy
+                  ? 'online'
+                  : 'offline'
               }`}
             />
             <span className="status-text">
-              {useMock
-                ? 'Mock Engine'
+              {isBackendHealthy === null
+                ? 'Connecting...'
                 : isBackendHealthy
                 ? 'API Online'
                 : 'API Offline'}

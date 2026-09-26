@@ -7,14 +7,12 @@ import { MetricsBanner } from './components/MetricsBanner';
 import { ThematicExplorer } from './components/ThematicExplorer';
 import { ExportBar } from './components/ExportBar';
 import { analyzeComments, checkBackendHealth } from './services/api';
-import { mockAnalysisResult } from './mocks/mockAnalysisData';
 import type { AnalyzeResponse, SourceType } from './types';
 import { AlertCircle } from 'lucide-react';
 
 export function App() {
-  const [useMock, setUseMock] = useState(true);
   const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
-  const [analysisData, setAnalysisData] = useState<AnalyzeResponse | null>(mockAnalysisResult);
+  const [analysisData, setAnalysisData] = useState<AnalyzeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -31,12 +29,6 @@ export function App() {
       });
   }, []);
 
-  const handleToggleMock = () => {
-    const nextMock = !useMock;
-    setUseMock(nextMock);
-    setErrorMessage(null);
-  };
-
   const handleAnalyze = async (options: {
     sourceType: SourceType;
     url: string;
@@ -47,15 +39,12 @@ export function App() {
     setErrorMessage(null);
 
     try {
-      const response = await analyzeComments(
-        {
-          source_type: options.sourceType,
-          url: options.url,
-          max_comments: options.maxComments,
-          generate_ideas: options.generateIdeas,
-        },
-        useMock,
-      );
+      const response = await analyzeComments({
+        source_type: options.sourceType,
+        url: options.url,
+        max_comments: options.maxComments,
+        generate_ideas: options.generateIdeas,
+      });
       setAnalysisData(response);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -73,11 +62,7 @@ export function App() {
 
   return (
     <div className="app-wrapper">
-      <Navbar
-        useMock={useMock}
-        onToggleMock={handleToggleMock}
-        isBackendHealthy={isBackendHealthy}
-      />
+      <Navbar isBackendHealthy={isBackendHealthy} />
 
       <main className="main-content">
         <div className="container">
@@ -90,11 +75,10 @@ export function App() {
               <AlertCircle size={20} className="text-rose" />
               <div>
                 <strong>Analysis Failed:</strong> {errorMessage}
-                {!useMock && !isBackendHealthy && (
+                {!isBackendHealthy && (
                   <p className="error-hint">
-                    Hint: Ensure your friend's backend is running on{' '}
-                    <code>http://localhost:8000</code> or toggle <strong>Mock Mode</strong>{' '}
-                    in the top navigation bar.
+                    Hint: Ensure your backend is running on{' '}
+                    <code>{import.meta.env.VITE_API_URL || 'http://localhost:8000'}</code>.
                   </p>
                 )}
               </div>

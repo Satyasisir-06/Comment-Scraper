@@ -68,32 +68,6 @@
   align-items: center;
   gap: 16px;
 }
-
-.mock-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-dim);
-  border-radius: 9999px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.mock-toggle-btn.active {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.35);
-  color: #a5b4fc;
-}
-
-.toggle-icon.on {
-  color: var(--accent-indigo);
-}
-
 .status-indicator {
   display: flex;
   align-items: center;
@@ -110,7 +84,7 @@
   color: var(--accent-rose);
 }
 
-.status-dot.mock {
+.status-dot.checking {
   color: var(--accent-amber);
 }
 

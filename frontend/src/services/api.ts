@@ -1,23 +1,14 @@
 import type { AnalyzeRequest, AnalyzeResponse } from '../types';
-import { mockAnalysisResult } from '../mocks/mockAnalysisData';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /**
- * Calls backend analysis endpoint or returns mock data.
+ * Calls backend analysis endpoint.
  * @param req The request parameters
- * @param useMock If true, returns mock fixture with simulated delay
  */
 export async function analyzeComments(
   req: AnalyzeRequest,
-  useMock = false,
 ): Promise<AnalyzeResponse> {
-  if (useMock) {
-    // Artificial latency for authentic loading experience
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return mockAnalysisResult;
-  }
-
   const response = await fetch(`${API_BASE_URL}/api/analyze`, {
     method: 'POST',
     headers: {

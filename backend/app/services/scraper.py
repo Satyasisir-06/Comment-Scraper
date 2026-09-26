@@ -14,6 +14,49 @@ except ImportError:
     HAS_YOUTUBE_DOWNLOADER = False
 
 
+class ScrapedResult:
+    """Encapsulates scraped comments and video metadata while supporting tuple unpacking."""
+    def __init__(
+        self,
+        title: str,
+        comments: List[Dict[str, Any]],
+        author: Optional[str] = None,
+        thumbnail_url: Optional[str] = None,
+    ):
+        self.title = title
+        self.comments = comments
+        self.author = author
+        self.thumbnail_url = thumbnail_url
+
+    def __iter__(self):
+        return iter([self.title, self.comments])
+
+    def __getitem__(self, index):
+        return [self.title, self.comments][index]
+
+
+def fetch_youtube_oembed(video_id: str) -> Tuple[str, Optional[str], Optional[str]]:
+    """
+    Fetches authentic video title, channel/author name, and thumbnail via YouTube's public oEmbed API.
+    Does not require an API key.
+    """
+    default_thumb = f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
+    try:
+        resp = requests.get(
+            f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json",
+            timeout=5,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            title = data.get("title") or f"YouTube Video ({video_id})"
+            author = data.get("author_name")
+            thumb = data.get("thumbnail_url") or default_thumb
+            return title, author, thumb
+    except Exception:
+        pass
+    return f"YouTube Video ({video_id})", None, default_thumb
+
+
 def extract_youtube_video_id(url: str) -> Optional[str]:
     """
     Extracts the 11-character YouTube video ID from various YouTube URL formats or plain ID.
@@ -176,8 +219,13 @@ def fetch_youtube_comments_via_downloader(
             },
         )
 
-    title = f"YouTube Video ({video_id})"
-    return title, comments
+    real_title, author, thumb = fetch_youtube_oembed(video_id)
+    return ScrapedResult(
+        title=real_title,
+        comments=comments,
+        author=author,
+        thumbnail_url=thumb,
+    )
 
 
 def fetch_comments(
@@ -185,10 +233,10 @@ def fetch_comments(
     url: Optional[str] = None,
     raw_text: Optional[str] = None,
     max_comments: int = 100,
-) -> Tuple[str, List[Dict[str, Any]]]:
+) -> Any:
     """
     Main scraper entrypoint.
-    Returns (source_title, raw_comments_list).
+    Returns ScrapedResult (supports both .title/.comments/.author/.thumbnail_url and tuple unpacking).
     """
     if source_type == "raw_text" or (raw_text and not url):
         if not raw_text or not raw_text.strip():
@@ -214,7 +262,12 @@ def fetch_comments(
                 }
             )
 
-        return "Raw Text Batch Input", comments
+        return ScrapedResult(
+            title="Raw Text Batch Input",
+            comments=comments,
+            author=None,
+            thumbnail_url=None,
+        )
 
     if source_type in ["youtube", "reddit"]:
         if not url:
