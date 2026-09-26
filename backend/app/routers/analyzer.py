@@ -33,10 +33,16 @@ def analyze_comments(request: AnalyzeRequest):
         url=request.url,
         raw_text=request.raw_text,
         max_comments=request.max_comments,
+        fetch_all=request.fetch_all,
     )
 
-    # 2. Extract authentic viewer questions
-    questions = extract_questions(raw_comments, max_questions=50)
+    # 2. Extract authentic viewer questions (scale question discovery dynamically)
+    target_questions = (
+        min(150, max(50, len(raw_comments) // 2))
+        if (request.fetch_all or request.max_comments > 100)
+        else 50
+    )
+    questions = extract_questions(raw_comments, max_questions=target_questions)
 
     # 3. Perform AI / Heuristic clustering and idea generation
     themes = analyze_and_cluster(

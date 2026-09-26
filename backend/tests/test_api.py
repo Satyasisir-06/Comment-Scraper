@@ -59,3 +59,18 @@ def test_analyze_endpoint_missing_input():
     assert response.status_code == 400
     data = response.json()
     assert data["error"] == "INVALID_URL"
+
+
+def test_analyze_endpoint_fetch_all():
+    lines = [f"Why does this happen in step {i}?" for i in range(1, 15)]
+    payload = {
+        "source_type": "raw_text",
+        "raw_text": "\n".join(lines),
+        "fetch_all": True,
+        "max_comments": 5,
+        "generate_ideas": False,
+    }
+    response = client.post("/api/analyze", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["metadata"]["total_comments_scanned"] == 14

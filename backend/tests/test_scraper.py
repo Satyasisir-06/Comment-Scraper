@@ -43,3 +43,27 @@ def test_fetch_comments_invalid_url():
         fetch_comments(source_type="youtube", url="https://invalid-url.com")
     assert exc_info.value.status_code == 400
     assert exc_info.value.detail["error"] == "INVALID_URL"
+
+
+def test_parse_like_count():
+    from app.services.scraper import parse_like_count
+    assert parse_like_count(None) == 0
+    assert parse_like_count(0) == 0
+    assert parse_like_count(42) == 42
+    assert parse_like_count("350") == 350
+    assert parse_like_count("1.2K") == 1200
+    assert parse_like_count("15K") == 15000
+    assert parse_like_count("2.5M") == 2500000
+    assert parse_like_count("10,500") == 10500
+    assert parse_like_count("invalid") == 0
+
+
+def test_fetch_comments_raw_text_fetch_all():
+    raw_text = "\n".join([f"Comment line {i}" for i in range(1, 25)])
+    # With max_comments=10
+    _, comments_limited = fetch_comments(source_type="raw_text", raw_text=raw_text, max_comments=10)
+    assert len(comments_limited) == 10
+
+    # With fetch_all=True
+    _, comments_all = fetch_comments(source_type="raw_text", raw_text=raw_text, max_comments=10, fetch_all=True)
+    assert len(comments_all) == 24

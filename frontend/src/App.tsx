@@ -35,6 +35,7 @@ export function App() {
     sourceType: SourceType;
     url: string;
     maxComments: number;
+    fetchAll: boolean;
     generateIdeas: boolean;
   }) => {
     setIsLoading(true);
@@ -45,6 +46,7 @@ export function App() {
         source_type: options.sourceType,
         url: options.url,
         max_comments: options.maxComments,
+        fetch_all: options.fetchAll,
         generate_ideas: options.generateIdeas,
       });
       setAnalysisData(response);

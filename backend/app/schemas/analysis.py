@@ -17,9 +17,13 @@ class AnalyzeRequest(BaseModel):
     )
     max_comments: int = Field(
         default=100,
-        ge=1,
-        le=500,
-        description="Maximum number of comments to scan (1 to 500)",
+        ge=0,
+        le=10000,
+        description="Maximum number of comments to scan (1 to 10000, or 0 for all comments)",
+    )
+    fetch_all: bool = Field(
+        default=False,
+        description="Whether to fetch all available comments (overrides max_comments)",
     )
     generate_ideas: bool = Field(
         default=True,
