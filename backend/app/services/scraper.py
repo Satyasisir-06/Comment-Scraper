@@ -98,64 +98,120 @@ def extract_youtube_video_id(url: str) -> Optional[str]:
     return None
 
 
+def parse_like_count(votes: Any) -> int:
+    """Parses likes/votes count which might be an int, float, or string ('1.2K', '350', '1M', '0', None)."""
+    if votes is None:
+        return 0
+    if isinstance(votes, (int, float)):
+        return int(votes)
+    val_str = str(votes).strip().upper().replace(",", "")
+    if not val_str:
+        return 0
+    try:
+        if val_str.endswith("K"):
+            return int(float(val_str[:-1]) * 1000)
+        elif val_str.endswith("M"):
+            return int(float(val_str[:-1]) * 1000000)
+        elif val_str.endswith("B"):
+            return int(float(val_str[:-1]) * 1000000000)
+        return int(float(val_str))
+    except Exception:
+        return 0
+
+
 def fetch_youtube_comments_via_api(
     video_id: str,
     api_key: str,
     max_comments: int = 100,
-) -> Tuple[str, List[Dict[str, Any]]]:
+    fetch_all: bool = False,
+) -> ScrapedResult:
     """
-    Fetch comments using official YouTube Data API v3.
+    Fetch comments using official YouTube Data API v3 with pagination support.
     """
     try:
-        # Get video details for title
+        # Get video details for title & thumbnail
         video_url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={video_id}&key={api_key}"
         res = requests.get(video_url, timeout=10)
         video_title = f"YouTube Video ({video_id})"
+        author_name = None
+        thumbnail_url = f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
         if res.status_code == 200:
             data = res.json()
             items = data.get("items", [])
             if items:
-                video_title = items[0]["snippet"].get("title", video_title)
+                snippet = items[0].get("snippet", {})
+                video_title = snippet.get("title", video_title)
+                author_name = snippet.get("channelTitle")
+                thumbnails = snippet.get("thumbnails", {})
+                thumbnail_url = thumbnails.get("high", {}).get("url") or thumbnail_url
 
-        # Get comments
-        comments_url = f"https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId={video_id}&maxResults={min(max_comments, 100)}&order=relevance&key={api_key}"
-        comments_res = requests.get(comments_url, timeout=10)
-
-        if comments_res.status_code == 403:
-            err_data = comments_res.json()
-            error_reason = (
-                err_data.get("error", {}).get("errors", [{}])[0].get("reason", "")
-            )
-            if error_reason == "commentsDisabled":
-                raise HTTPException(
-                    status_code=422,
-                    detail={
-                        "error": "COMMENTS_DISABLED",
-                        "message": "This video has comments disabled or requires authentication.",
-                        "details": None,
-                    },
-                )
-
-        if comments_res.status_code != 200:
-            raise Exception(f"YouTube API returned status {comments_res.status_code}")
-
-        items = comments_res.json().get("items", [])
+        target_limit = 5000 if (fetch_all or max_comments <= 0) else max_comments
         raw_comments = []
-        for index, item in enumerate(items):
-            snippet = item["snippet"]["topLevelComment"]["snippet"]
-            raw_comments.append(
-                {
-                    "id": f"yt_{video_id}_{index+1}",
-                    "author": snippet.get("authorDisplayName", "@anonymous"),
-                    "text": snippet.get("textDisplay", snippet.get("textOriginal", "")),
-                    "likes": snippet.get("likeCount", 0),
-                    "published_at": snippet.get(
-                        "publishedAt", datetime.now(timezone.utc).isoformat()
-                    ),
-                }
-            )
+        page_token = None
 
-        return video_title, raw_comments
+        while True:
+            per_page = min(100, target_limit - len(raw_comments)) if target_limit else 100
+            if per_page <= 0:
+                break
+
+            comments_url = (
+                f"https://www.googleapis.com/youtube/v3/commentThreads?"
+                f"part=snippet&videoId={video_id}&maxResults={per_page}&order=relevance&key={api_key}"
+            )
+            if page_token:
+                comments_url += f"&pageToken={page_token}"
+
+            comments_res = requests.get(comments_url, timeout=10)
+
+            if comments_res.status_code == 403:
+                err_data = comments_res.json()
+                error_reason = (
+                    err_data.get("error", {}).get("errors", [{}])[0].get("reason", "")
+                )
+                if error_reason == "commentsDisabled":
+                    raise HTTPException(
+                        status_code=422,
+                        detail={
+                            "error": "COMMENTS_DISABLED",
+                            "message": "This video has comments disabled or requires authentication.",
+                            "details": None,
+                        },
+                    )
+
+            if comments_res.status_code != 200:
+                raise Exception(f"YouTube API returned status {comments_res.status_code}")
+
+            json_data = comments_res.json()
+            items = json_data.get("items", [])
+            if not items:
+                break
+
+            for index, item in enumerate(items):
+                snippet = item["snippet"]["topLevelComment"]["snippet"]
+                raw_comments.append(
+                    {
+                        "id": f"yt_{video_id}_{len(raw_comments)+1}",
+                        "author": snippet.get("authorDisplayName", "@anonymous"),
+                        "text": snippet.get("textDisplay", snippet.get("textOriginal", "")),
+                        "likes": parse_like_count(snippet.get("likeCount", 0)),
+                        "published_at": snippet.get(
+                            "publishedAt", datetime.now(timezone.utc).isoformat()
+                        ),
+                    }
+                )
+                if target_limit and len(raw_comments) >= target_limit:
+                    break
+
+            page_token = json_data.get("nextPageToken")
+            if not page_token or (target_limit and len(raw_comments) >= target_limit):
+                break
+
+        return ScrapedResult(
+            title=video_title,
+            comments=raw_comments,
+            author=author_name,
+            thumbnail_url=thumbnail_url,
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -182,9 +238,11 @@ def fetch_youtube_video_title(video_id: str) -> str:
 def fetch_youtube_comments_via_downloader(
     video_id: str,
     max_comments: int = 100,
-) -> Tuple[str, List[Dict[str, Any]]]:
+    fetch_all: bool = False,
+) -> ScrapedResult:
     """
     Fetch comments using youtube-comment-downloader without requiring API keys.
+    If fetch_all is True or max_comments <= 0, fetches all available comments up to 5,000 safety limit.
     """
     if not HAS_YOUTUBE_DOWNLOADER:
         raise RuntimeError("youtube-comment-downloader is not installed.")
@@ -196,20 +254,23 @@ def fetch_youtube_comments_via_downloader(
 
     comments = []
     count = 0
+    target_limit = 5000 if (fetch_all or max_comments <= 0) else max_comments
+
     try:
         for comment in generator:
             count += 1
             pub_at = comment.get("time") or datetime.now(timezone.utc).isoformat()
+            raw_votes = comment.get("votes")
             comments.append(
                 {
                     "id": comment.get("cid") or f"yt_{video_id}_{count}",
                     "author": comment.get("author") or "@anonymous",
                     "text": comment.get("text") or "",
-                    "likes": comment.get("votes") or 0,
+                    "likes": parse_like_count(raw_votes),
                     "published_at": pub_at,
                 }
             )
-            if count >= max_comments:
+            if target_limit and count >= target_limit:
                 break
     except Exception as e:
         # Check if error implies comments disabled or missing video
@@ -236,8 +297,13 @@ def fetch_youtube_comments_via_downloader(
             },
         )
 
-    title = fetch_youtube_video_title(video_id)
-    return title, comments
+    title, author, thumb = fetch_youtube_oembed(video_id)
+    return ScrapedResult(
+        title=title,
+        comments=comments,
+        author=author,
+        thumbnail_url=thumb,
+    )
 
 
 
@@ -246,7 +312,8 @@ def fetch_comments(
     url: Optional[str] = None,
     raw_text: Optional[str] = None,
     max_comments: int = 100,
-) -> Any:
+    fetch_all: bool = False,
+) -> ScrapedResult:
     """
     Main scraper entrypoint.
     Returns ScrapedResult (supports both .title/.comments/.author/.thumbnail_url and tuple unpacking).
@@ -263,8 +330,9 @@ def fetch_comments(
             )
 
         lines = [line.strip() for line in raw_text.split("\n") if line.strip()]
+        selected_lines = lines if (fetch_all or max_comments <= 0) else lines[:max_comments]
         comments = []
-        for idx, line in enumerate(lines[:max_comments]):
+        for idx, line in enumerate(selected_lines):
             comments.append(
                 {
                     "id": f"raw_{idx+1}",
@@ -308,7 +376,7 @@ def fetch_comments(
         if settings.YOUTUBE_API_KEY:
             try:
                 return fetch_youtube_comments_via_api(
-                    video_id, settings.YOUTUBE_API_KEY, max_comments
+                    video_id, settings.YOUTUBE_API_KEY, max_comments, fetch_all=fetch_all
                 )
             except HTTPException:
                 raise
@@ -319,7 +387,7 @@ def fetch_comments(
         if HAS_YOUTUBE_DOWNLOADER:
             try:
                 return fetch_youtube_comments_via_downloader(
-                    video_id, max_comments
+                    video_id, max_comments, fetch_all=fetch_all
                 )
             except HTTPException:
                 raise

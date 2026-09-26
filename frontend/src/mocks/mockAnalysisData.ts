@@ -145,7 +145,7 @@ export const mockAnalysisResult: AnalyzeResponse = {
       id: 'c_5',
       author: '@sec_dev',
       text: 'Where should JWT tokens be stored securely if local storage is prone to XSS attacks?',
-      likes: 54,
+      likes: 124,
       published_at: '2026-09-24T16:20:00Z',
     },
     {
@@ -154,6 +154,27 @@ export const mockAnalysisResult: AnalyzeResponse = {
       text: 'Thanks for making this video, really appreciated the clear code examples!',
       likes: 8,
       published_at: '2026-09-25T11:00:00Z',
+    },
+    {
+      id: 'c_7',
+      author: '@curious_learner',
+      text: 'Can you do a video on micro-frontends with Vite module federation next?',
+      likes: 0,
+      published_at: '2026-09-25T15:30:00Z',
+    },
+    {
+      id: 'c_8',
+      author: '@nextjs_fan',
+      text: 'How does this compare with App Router server actions in Next.js 15?',
+      likes: 62,
+      published_at: '2026-09-26T09:12:00Z',
+    },
+    {
+      id: 'c_9',
+      author: '@beginner_coder',
+      text: 'Is there a starter GitHub repository with these exact configuration files?',
+      likes: 0,
+      published_at: '2026-09-26T12:05:00Z',
     },
   ],
 };

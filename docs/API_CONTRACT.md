@@ -51,7 +51,8 @@ Ingests a source URL (YouTube video or thread), extracts comments, filters quest
 | `source_type` | `string` | Yes | Enum: `"youtube"` \| `"reddit"` \| `"raw_text"` |
 | `url` | `string` | Conditional | Required if `source_type` is `"youtube"` or `"reddit"`. Must be a valid URL. |
 | `raw_text` | `string` | Conditional | Optional multiline comment strings if testing manually without URLs. |
-| `max_comments` | `integer` | No | Default `100`, Maximum `500`. |
+| `max_comments` | `integer` | No | Default `100`, Maximum `10000` (or `0` for all comments). |
+| `fetch_all` | `boolean` | No | Default `false`. If `true`, scans and extracts all available comments. |
 | `generate_ideas`| `boolean` | No | Default `true`. Generates actionable ideas per cluster. |
 
 ---

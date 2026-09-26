@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, X, AlertCircle, MessageCircle, FileText } from 'lucide-react';
+import { ArrowRight, X, AlertCircle, MessageCircle, FileText, Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { SourceType } from '../types';
 
 interface HeroInputProps {
@@ -7,6 +7,7 @@ interface HeroInputProps {
     sourceType: SourceType;
     url: string;
     maxComments: number;
+    fetchAll: boolean;
     generateIdeas: boolean;
   }) => void;
   isLoading: boolean;
@@ -16,10 +17,12 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
   const [url, setUrl] = useState('');
   const [sourceType, setSourceType] = useState<SourceType>('youtube');
   const [maxComments, setMaxComments] = useState(150);
+  const [fetchAll, setFetchAll] = useState(false);
   const [generateIdeas, setGenerateIdeas] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const DEMO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+  const PRESETS = [100, 250, 500, 1000];
 
   const validateUrl = (input: string): boolean => {
     if (!input.trim()) {
@@ -44,7 +47,8 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
     onAnalyze({
       sourceType,
       url: url.trim(),
-      maxComments,
+      maxComments: fetchAll ? 0 : maxComments,
+      fetchAll,
       generateIdeas,
     });
   };
@@ -56,6 +60,7 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
       sourceType: 'youtube',
       url: DEMO_URL,
       maxComments: 150,
+      fetchAll: false,
       generateIdeas: true,
     });
   };
@@ -178,21 +183,62 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
 
         {/* Precision Fine-Tuning Controls */}
         <div className="options-row">
-          <div className="option-item slider-item">
-            <span className="options-label">Sample Volume:</span>
-            <input
-              id="max-comments-slider"
-              type="range"
-              min="50"
-              max="500"
-              step="50"
-              value={maxComments}
-              onChange={(e) => setMaxComments(Number(e.target.value))}
+          <div className="fetch-mode-switch">
+            <button
+              type="button"
+              className={`fetch-mode-btn ${!fetchAll ? 'active' : ''}`}
+              onClick={() => setFetchAll(false)}
               disabled={isLoading}
-              className="range-slider"
-            />
-            <span className="mono-val">{maxComments} comments</span>
+            >
+              <SlidersHorizontal size={12} />
+              <span>Sample Volume</span>
+            </button>
+            <button
+              type="button"
+              className={`fetch-mode-btn ${fetchAll ? 'active' : ''}`}
+              onClick={() => setFetchAll(true)}
+              disabled={isLoading}
+            >
+              <Sparkles size={12} />
+              <span>Fetch All Comments</span>
+              <span className="badge-all-pill">ALL</span>
+            </button>
           </div>
+
+          {!fetchAll ? (
+            <div className="option-item slider-item">
+              <input
+                id="max-comments-slider"
+                type="range"
+                min="50"
+                max="1000"
+                step="50"
+                value={maxComments}
+                onChange={(e) => setMaxComments(Number(e.target.value))}
+                disabled={isLoading}
+                className="range-slider"
+              />
+              <span className="mono-val">{maxComments} comments</span>
+              <div className="quick-presets">
+                {PRESETS.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    className={`preset-btn ${maxComments === p ? 'active' : ''}`}
+                    onClick={() => setMaxComments(p)}
+                    disabled={isLoading}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="fetch-all-indicator">
+              <span className="indicator-glow" />
+              <span>Full Thread: extracting all public comments</span>
+            </div>
+          )}
 
           <label className="checkbox-label">
             <input
@@ -201,7 +247,7 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
               onChange={(e) => setGenerateIdeas(e.target.checked)}
               disabled={isLoading}
             />
-            <span>Synthesize Content Concepts</span>
+            <span>Synthesize Concepts</span>
           </label>
 
           <div className="demo-link-wrap">

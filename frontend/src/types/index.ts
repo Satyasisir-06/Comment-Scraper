@@ -10,6 +10,7 @@ export interface AnalyzeRequest {
   url?: string;
   raw_text?: string;
   max_comments?: number;
+  fetch_all?: boolean;
   generate_ideas?: boolean;
 }
 
