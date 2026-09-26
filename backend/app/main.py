@@ -2,7 +2,6 @@
 Comment Scraper & Idea Catalyst - Backend API Entrypoint
 Conforms strictly to contract defined in docs/API_CONTRACT.md
 """
-
 import sys
 import os
 
