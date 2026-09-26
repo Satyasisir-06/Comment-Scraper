@@ -5,6 +5,7 @@ import {
   Copy,
   Check,
   MessageSquare,
+  ArrowUpDown,
 } from 'lucide-react';
 import type { ThemeCluster, QuestionItem, GeneratedIdea, CommentItem } from '../types';
 
@@ -13,6 +14,8 @@ interface ThematicExplorerProps {
   rawComments?: CommentItem[];
 }
 
+type SortOption = 'highest_likes' | 'least_likes' | 'default';
+
 export const ThematicExplorer: React.FC<ThematicExplorerProps> = ({
   themes,
   rawComments,
@@ -20,6 +23,8 @@ export const ThematicExplorer: React.FC<ThematicExplorerProps> = ({
   const [activeTab, setActiveTab] = useState<number | 'all_comments'>(0);
   const [questionSearch, setQuestionSearch] = useState('');
   const [allCommentSearch, setAllCommentSearch] = useState('');
+  const [questionSort, setQuestionSort] = useState<SortOption>('highest_likes');
+  const [allCommentSort, setAllCommentSort] = useState<SortOption>('highest_likes');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   if ((!themes || themes.length === 0) && (!rawComments || rawComments.length === 0)) return null;
@@ -40,11 +45,23 @@ export const ThematicExplorer: React.FC<ThematicExplorerProps> = ({
         q.author.toLowerCase().includes(questionSearch.toLowerCase()),
     ) || [];
 
+  const sortedQuestions = [...filteredQuestions].sort((a, b) => {
+    if (questionSort === 'highest_likes') return (b.likes || 0) - (a.likes || 0);
+    if (questionSort === 'least_likes') return (a.likes || 0) - (b.likes || 0);
+    return 0;
+  });
+
   const filteredAllComments = (rawComments || []).filter(
     (c) =>
       c.text.toLowerCase().includes(allCommentSearch.toLowerCase()) ||
       c.author.toLowerCase().includes(allCommentSearch.toLowerCase()),
   );
+
+  const sortedAllComments = [...filteredAllComments].sort((a, b) => {
+    if (allCommentSort === 'highest_likes') return (b.likes || 0) - (a.likes || 0);
+    if (allCommentSort === 'least_likes') return (a.likes || 0) - (b.likes || 0);
+    return 0;
+  });
 
   return (
     <div className="thematic-explorer-container">
@@ -95,16 +112,34 @@ export const ThematicExplorer: React.FC<ThematicExplorerProps> = ({
                   All Ingested Comments ({rawComments?.length || 0})
                 </h2>
               </div>
-              <div className="question-search-wrap" style={{ width: '240px' }}>
-                <Search size={13} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search comments..."
-                  value={allCommentSearch}
-                  onChange={(e) => setAllCommentSearch(e.target.value)}
-                  className="question-search-input"
-                  style={{ width: '100%' }}
-                />
+
+              <div className="filter-controls-group">
+                {/* Sort control for All Comments */}
+                <div className="sort-select-wrap">
+                  <ArrowUpDown size={12} className="sort-icon" />
+                  <select
+                    value={allCommentSort}
+                    onChange={(e) => setAllCommentSort(e.target.value as SortOption)}
+                    className="sort-select-dropdown"
+                    aria-label="Sort comments"
+                  >
+                    <option value="highest_likes">Highest Likes</option>
+                    <option value="least_likes">Least Likes</option>
+                    <option value="default">Original Order</option>
+                  </select>
+                </div>
+
+                <div className="question-search-wrap" style={{ width: '220px' }}>
+                  <Search size={13} className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Search comments..."
+                    value={allCommentSearch}
+                    onChange={(e) => setAllCommentSearch(e.target.value)}
+                    className="question-search-input"
+                    style={{ width: '100%' }}
+                  />
+                </div>
               </div>
             </div>
             <p className="theme-summary-text">
@@ -121,12 +156,12 @@ export const ThematicExplorer: React.FC<ThematicExplorerProps> = ({
               maxHeight: '560px',
             }}
           >
-            {filteredAllComments.length === 0 ? (
+            {sortedAllComments.length === 0 ? (
               <div className="empty-filter-state" style={{ gridColumn: '1 / -1' }}>
                 <span>No comments match your search filter.</span>
               </div>
             ) : (
-              filteredAllComments.map((c: CommentItem) => (
+              sortedAllComments.map((c: CommentItem) => (
                 <div key={c.id} className="question-card">
                   <div className="question-header">
                     <span className="question-author">@{c.author}</span>
@@ -203,28 +238,45 @@ export const ThematicExplorer: React.FC<ThematicExplorerProps> = ({
             <div className="content-column questions-column">
               <div className="column-header">
                 <h3 className="column-title">
-                  Direct Inquiries <span className="mono-count">({filteredQuestions.length})</span>
+                  Direct Inquiries <span className="mono-count">({sortedQuestions.length})</span>
                 </h3>
 
-                <div className="question-search-wrap">
-                  <Search size={13} className="search-icon" />
-                  <input
-                    type="text"
-                    placeholder="Filter inquiries..."
-                    value={questionSearch}
-                    onChange={(e) => setQuestionSearch(e.target.value)}
-                    className="question-search-input"
-                  />
+                <div className="column-controls-wrap">
+                  {/* Sort control for Direct Inquiries */}
+                  <div className="sort-select-wrap">
+                    <ArrowUpDown size={11} className="sort-icon" />
+                    <select
+                      value={questionSort}
+                      onChange={(e) => setQuestionSort(e.target.value as SortOption)}
+                      className="sort-select-dropdown"
+                      aria-label="Sort questions"
+                    >
+                      <option value="highest_likes">Highest Likes</option>
+                      <option value="least_likes">Least Likes</option>
+                      <option value="default">Default</option>
+                    </select>
+                  </div>
+
+                  <div className="question-search-wrap">
+                    <Search size={13} className="search-icon" />
+                    <input
+                      type="text"
+                      placeholder="Filter inquiries..."
+                      value={questionSearch}
+                      onChange={(e) => setQuestionSearch(e.target.value)}
+                      className="question-search-input"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="questions-list">
-                {filteredQuestions.length === 0 ? (
+                {sortedQuestions.length === 0 ? (
                   <div className="empty-filter-state">
                     <span>No questions match your filter.</span>
                   </div>
                 ) : (
-                  filteredQuestions.map((q: QuestionItem) => (
+                  sortedQuestions.map((q: QuestionItem) => (
                     <div key={q.id} className="question-card">
                       <div className="question-header">
                         <span className="question-author">@{q.author}</span>

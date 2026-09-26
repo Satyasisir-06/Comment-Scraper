@@ -15,7 +15,7 @@ interface HeroInputProps {
 export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) => {
   const [url, setUrl] = useState('');
   const [sourceType, setSourceType] = useState<SourceType>('youtube');
-  const [maxComments, setMaxComments] = useState(150);
+  const [maxComments] = useState(500);
   const [generateIdeas, setGenerateIdeas] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -178,20 +178,9 @@ export const HeroInput: React.FC<HeroInputProps> = ({ onAnalyze, isLoading }) =>
 
         {/* Precision Fine-Tuning Controls */}
         <div className="options-row">
-          <div className="option-item slider-item">
-            <span className="options-label">Sample Volume:</span>
-            <input
-              id="max-comments-slider"
-              type="range"
-              min="50"
-              max="500"
-              step="50"
-              value={maxComments}
-              onChange={(e) => setMaxComments(Number(e.target.value))}
-              disabled={isLoading}
-              className="range-slider"
-            />
-            <span className="mono-val">{maxComments} comments</span>
+          <div className="option-item">
+            <span className="options-label">Fetch Scope:</span>
+            <span className="mono-val">All Available Comments</span>
           </div>
 
           <label className="checkbox-label">

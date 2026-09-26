@@ -553,36 +553,31 @@
   margin-bottom: 12px;
 }
 
-/* Progress Status Card */
+/* Progress Status Card — Contained LatticeLoader Hallmark */
 .status-progress-card {
   max-width: 780px;
+  width: 100%;
   margin: 24px auto;
-  padding: 18px 22px;
+  padding: 24px 28px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.progress-header {
+.loader-inner-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lattice-loader-wrapper {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.progress-status-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.progress-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.step-counter {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  justify-content: center;
+  padding: 6px 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .progress-bar-track {
@@ -591,65 +586,59 @@
   background: var(--bg-subtle);
   border-radius: var(--radius-full);
   overflow: hidden;
-  margin-bottom: 14px;
+  box-sizing: border-box;
 }
 
 .progress-bar-fill {
   height: 100%;
   background: #ffffff;
-  transition: width 0.3s ease;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.steps-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-
-.step-item {
+.steps-badges-row {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  color: var(--text-faint);
-}
-
-.step-bullet {
-  width: 18px;
-  height: 18px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-subtle);
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.step-badge-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.step-badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: currentColor;
   flex-shrink: 0;
 }
 
-.step-item.current {
-  color: var(--text-primary);
-}
-
-.step-item.current .step-bullet {
-  border-color: #ffffff;
-  background: var(--bg-surface-elevated);
+.step-badge-item.current {
   color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: var(--bg-subtle);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
-.step-item.done {
-  color: var(--text-secondary);
-}
-
-.step-item.done .step-bullet {
-  border-color: var(--border-strong);
+.step-badge-item.done {
   color: var(--status-online);
-}
-
-.step-label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.05);
 }
 
 /* Metrics Section */
@@ -1106,6 +1095,49 @@
 .footer-meta {
   font-family: var(--font-mono);
   color: var(--text-faint);
+}
+
+/* Sorting Controls Hallmark */
+.filter-controls-group,
+.column-controls-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 3px 6px;
+  transition: border-color 0.15s;
+}
+
+.sort-select-wrap:focus-within {
+  border-color: var(--border-focus);
+}
+
+.sort-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.sort-select-dropdown {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.sort-select-dropdown option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 /* Responsive Breakpoints */
