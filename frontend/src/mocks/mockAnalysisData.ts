@@ -1,4 +1,4 @@
-import { AnalyzeResponse } from '../types';
+import type { AnalyzeResponse } from '../types';
 
 export const mockAnalysisResult: AnalyzeResponse = {
   job_id: 'job_sample_demo_101',
