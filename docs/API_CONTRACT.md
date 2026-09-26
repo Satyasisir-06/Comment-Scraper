@@ -131,8 +131,18 @@ Ingests a source URL (YouTube video or thread), extracts comments, filters quest
         }
       ]
     }
+  ],
+  "raw_comments": [
+    {
+      "id": "q_101",
+      "author": "@alex_codes",
+      "text": "How do you handle deeply nested state without re-rendering the entire component tree?",
+      "likes": 42,
+      "published_at": "2026-09-20T10:15:00Z"
+    }
   ]
 }
+
 ```
 
 ---

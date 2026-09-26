@@ -1,4 +1,4 @@
-import { AnalyzeResponse } from '../types';
+import type { AnalyzeResponse } from '../types';
 
 export const mockAnalysisResult: AnalyzeResponse = {
   job_id: 'job_sample_demo_101',
@@ -112,4 +112,49 @@ export const mockAnalysisResult: AnalyzeResponse = {
       ],
     },
   ],
+  raw_comments: [
+    {
+      id: 'c_1',
+      author: '@alex_codes',
+      text: 'How do you handle deeply nested state without re-rendering the entire component tree?',
+      likes: 42,
+      published_at: '2026-09-20T10:15:00Z',
+    },
+    {
+      id: 'c_2',
+      author: '@dev_dan',
+      text: 'Is Redux still relevant in 2026 or should everyone switch to signals / zustand?',
+      likes: 28,
+      published_at: '2026-09-21T14:22:00Z',
+    },
+    {
+      id: 'c_3',
+      author: '@tech_guru',
+      text: 'Great video! The explanation on compiler optimizations was super helpful.',
+      likes: 15,
+      published_at: '2026-09-21T18:05:00Z',
+    },
+    {
+      id: 'c_4',
+      author: '@cloud_novice',
+      text: 'What is the cheapest way to host this stack without getting hit by surprise serverless egress fees?',
+      likes: 35,
+      published_at: '2026-09-22T08:00:00Z',
+    },
+    {
+      id: 'c_5',
+      author: '@sec_dev',
+      text: 'Where should JWT tokens be stored securely if local storage is prone to XSS attacks?',
+      likes: 54,
+      published_at: '2026-09-24T16:20:00Z',
+    },
+    {
+      id: 'c_6',
+      author: '@web_enthusiast',
+      text: 'Thanks for making this video, really appreciated the clear code examples!',
+      likes: 8,
+      published_at: '2026-09-25T11:00:00Z',
+    },
+  ],
 };
+

@@ -1,4 +1,4 @@
-import { AnalyzeRequest, AnalyzeResponse } from '../types';
+import type { AnalyzeRequest, AnalyzeResponse } from '../types';
 import { mockAnalysisResult } from '../mocks/mockAnalysisData';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';

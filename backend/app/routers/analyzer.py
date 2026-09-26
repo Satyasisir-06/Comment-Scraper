@@ -59,4 +59,6 @@ def analyze_comments(request: AnalyzeRequest):
             themes_count=len(themes),
         ),
         themes=themes,
+        raw_comments=raw_comments,
     )
+

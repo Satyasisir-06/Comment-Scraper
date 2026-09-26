@@ -35,6 +35,10 @@ class QuestionItem(BaseModel):
     published_at: str
 
 
+# Alias for raw comments
+CommentItem = QuestionItem
+
+
 class GeneratedIdea(BaseModel):
     id: str
     title: str
@@ -65,9 +69,11 @@ class AnalyzeResponse(BaseModel):
     timestamp: str
     metadata: AnalysisMetadata
     themes: List[ThemeCluster]
+    raw_comments: Optional[List[CommentItem]] = Field(default_factory=list)
 
 
 class APIErrorDetail(BaseModel):
     error: str
     message: str
     details: Optional[Dict[str, Any]] = None
+
