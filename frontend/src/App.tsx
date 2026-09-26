@@ -108,7 +108,10 @@ export function App() {
                 ideasCount={totalIdeasCount}
               />
 
-              <ThematicExplorer themes={analysisData.themes} />
+              <ThematicExplorer
+                themes={analysisData.themes}
+                rawComments={analysisData.raw_comments}
+              />
 
               <ExportBar data={analysisData} />
             </>

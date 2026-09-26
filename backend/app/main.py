@@ -2,6 +2,11 @@
 Comment Scraper & Idea Catalyst - Backend API Entrypoint
 Conforms strictly to contract defined in docs/API_CONTRACT.md
 """
+import sys
+import os
+
+# Ensure backend root is in python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -10,6 +15,7 @@ from fastapi.exceptions import RequestValidationError
 
 from app.config import settings
 from app.routers import health_router, analyzer_router
+
 
 app = FastAPI(
     title="Comment Scraper & Idea Catalyst API",
